@@ -39,13 +39,14 @@ Maledata$infected<-relevel(Maledata$infected, "OK")
 ## Barchart
 
 ```{r}
-males <- maledata %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+Males <- Maledata %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
 
-basicC <- ggplot(males,aes(x=infected,y=count,fill=treatment))
+basicC <- ggplot(Males,aes(x=infected,y=count,fill=treatment))
 basicC + geom_bar(stat="identity",position="dodge")
+
 #Now for percentage plot
 
-basicCC <- ggplot(males,aes(x=infected,y=prcnt*100,fill=treatment)) 
+basicCC <- ggplot(Males,aes(x=infected,y=prcnt*100,fill=treatment)) 
 basicCC + geom_bar(stat="identity", position = "dodge")
 ```
 
@@ -54,7 +55,7 @@ This bar chart appears to show that around 340 people who were infected with Cov
 ### Numerical Summaries  
 
 ```{r}
-table1 <- xtabs(~treatment + infected, data=maledata)
+table1 <- xtabs(~treatment + infected, data=Maledata)
 rowPerc(table1)
 colPerc(table1)
 print(table1)
@@ -139,18 +140,53 @@ The vaccine is 67% effective in females.
 
 # LGBTQ
 
+```{r}
+LGBTQdata <- filter(FinalData, LGBTQ== "gay")
+LGBTQdata$DrugUser <- as.factor(LGBTQdata$LGBTQ)
+LGBTQdata$infected=factor(LGBTQdata$infected)
+LGBTQdata$infected<-relevel(LGBTQdata$infected, "OK")
+```
+
+
 ## Barchart
 
 ```{r}
-males <- maledata %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+LGBTQ <- LGBTQdata %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
 
-basicC <- ggplot(males,aes(x=infected,y=count,fill=treatment))
+basicC <- ggplot(LGBTQ,aes(x=infected,y=count,fill=treatment))
 basicC + geom_bar(stat="identity",position="dodge")
 #Now for percentage plot
 
-basicCC <- ggplot(males,aes(x=infected,y=prcnt*100,fill=treatment)) 
+basicCC <- ggplot(LGBTQ,aes(x=infected,y=prcnt*100,fill=treatment)) 
 basicCC + geom_bar(stat="identity", position = "dodge")
 ```
+
+This bar chart shows that shows that out of the approximately 116 LGBTQ, who were infected with COVID-19. 70% were given the drug, and 29% were given the placebo. 
+
+
+### Numerical Summaries  
+
+```{r}
+table3 <- xtabs(~infected + treatment, data=LGBTQdata)
+rowPerc(table3)
+colPerc(table3)
+print(table3)
+```
+
+The table shows that about 116 LGBTQ were infected with COVID-19 out of approximately 2,040 LGBTQ in the study. The table also shows that 70% of LGBTQ who received the drug contracted COVID-19 and 29% of LGBTQ who received the placebo contracted COVID-19. Lastly, the table show that LGBTQ who got the vaccine were about 29% more likely to contract COVID. This means the placebo is not effective for the LQBTQ population. 
+
+
+## Inferential  
+
+```{r}
+table3 <- xtabs(~treatment + infected, data= LGBTQdata)
+chisq.test(table3)
+chisqtestGC(table3)
+fisher.test(table3)
+```
+
+This table shows that about 116 LGBTQ had been infected with the COVID virus out of 2,040 participants in this study. This table also shows that 70% of LGBTQ who received the drug contracted COVID and 29% who received the placebo contracted COVID. Finally, the table shows that LGBTQ who got their vaccine were 29% more likely to contract COVID_19. This shows that the vaccine is ineffective for the LGBTQ popultion. 
+
 
 
 # Drug Users
@@ -174,27 +210,40 @@ basicCC <- ggplot(Druggies,aes(x=infected,y=prcnt*100,fill=treatment))
 basicCC + geom_bar(stat="identity", position = "dodge")
 ```
 
+This barchart shows that out of the approximately 117 DrugUsers who contracted COVID-19, 32% were given the drug. While 66% were given the placebo.
+
 ### Numerical Summaries  
 
 ```{r}
-table3 <- xtabs(~infected + treatment, data=Femaledata)
-rowPerc(table3)
-colPerc(table3)
-print(table3)
+table4 <- xtabs(~infected + treatment, data=Druggiedata)
+rowPerc(table4)
+colPerc(table4)
+print(table4)
 ```
+
+The table shows that 117 of drug users out of 2,280 were infected with COVID-19. The table shows that 33.3% of drug users who received the drug contracted Covid-19 and 66.6% of drug users who received the placebo contracted covid. Drug users who got the vaccine the vaccine were 60% less likely to get COVID-19. Thus making the vaccine effetive for drug users. 
+
 
 ## Inferential  
 
 ```{r}
-chisq.test(table3)
-chisqtestGC(table3)
-fisher.test(table3)
+chisq.test(table4)
+chisqtestGC(table4)
+fisher.test(table4)
 ```
 
-The vaccine is 58% effective in the Druggie population. 
+The P-value is so small at 0.002273 that it is highly unlikely that the results were by chance. 
 
+$H_0$ the null hypothesis is that the vaccine makes no difference in the drug user population when it comes to contracting COVID-19.
 
+$H_0$ the alternative hypothesis is that the vaccine in fact does make a difference in whether or not a drug user contracts COVID-19.
+
+We reject the null hypothesis.
+
+The fisher exact test odds ratio is 1.831:1 when taking the odds ratio and computing it into a percent of effectiveness by using the formula 0/(1+0)*100 you get 60% effectiveness. Utimately, the vaccine is 60% effective in the Druggie population.
 
 
 
 # Discussion & Conclusion
+
+When comparing the four populations, we find that two of populations had the highest rate of effectiveness were the Female group at 67% and the DrugUser group at 60% The Male and LGBTQ groups showed that the vaccine was ineffective. The Male group had 40% effectiveness while the LGBTQ group had 29% effectiveness. 
